@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using REMIwebApi.Datos;
 using REMIwebApi.Models;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace REMIwebApi.Controllers
 {
@@ -12,56 +13,92 @@ namespace REMIwebApi.Controllers
     public class ClientesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<cliente> _user;
 
-        public ClientesController(UserManager<cliente> user, ApplicationDbContext context) //parametro  
+        public ClientesController(ApplicationDbContext context)
         {
-            this._user = user;
-            this._context = context;
+            _context = context;
         }
-        // GET: api/<ClientesController>
+
+        // GET: api/Clientes
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<IEnumerable<cliente>>> Get()
         {
-            return new string[] { "value1", "value2" };
+            return await _context.clientes.ToListAsync();
         }
 
-        // GET api/<ClientesController>/5
+        // GET: api/Clientes/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<cliente>> Get(int id)
         {
-            return "value";
+            var cliente = await _context.clientes.FindAsync(id);
+
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+
+            return cliente;
         }
 
-        // POST api/<ClientesController>
+        // POST: api/Clientes
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] cliente models)
+        public async Task<ActionResult<cliente>> Post([FromBody] cliente model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var usuario = new cliente()
+
+            _context.clientes.Add(model);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(Get), new { id = model.Id_cliente }, model);
+        }
+
+        // PUT: api/Clientes/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] cliente model)
+        {
+            if (id != model.Id_cliente)
             {
-                Id_cliente = models.Id_cliente,
-                nombre = models.nombre,
-                Apellido = models.Apellido,
-                correo = models.correo,
-                Telefono = models.Telefono
-            };
+                return BadRequest();
+            }
 
-            return Ok(new { usuario.Id_cliente, usuario.correo });
-        }
-            // PUT api/<ClientesController>/5
-            [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
+            _context.Entry(model).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.clientes.Any(e => e.Id_cliente == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // DELETE api/<ClientesController>/5
+        // DELETE: api/Clientes/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            var cliente = await _context.clientes.FindAsync(id);
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+
+            _context.clientes.Remove(cliente);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("REMIwebApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e8dd3e9b64c9819ec894781318c337256ea70696")]
 [assembly: System.Reflection.AssemblyProductAttribute("REMIwebApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("REMIwebApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
